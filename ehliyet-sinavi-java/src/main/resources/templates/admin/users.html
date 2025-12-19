@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Yönetimi - Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { 
+            background: white; 
+            padding: 20px 30px; 
+            border-radius: 15px; 
+            margin-bottom: 25px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .header h1 { color: #333; font-size: 24px; }
+        .header-buttons { display: flex; gap: 10px; }
+        .btn { 
+            display: inline-block; 
+            padding: 12px 25px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            text-decoration: none; 
+            transition: all 0.3s;
+        }
+        .btn-primary { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-sm { padding: 8px 15px; font-size: 13px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .alert-danger { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        
+        .content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .table-responsive { overflow-x: auto; }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        .table th, .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+        .table tr:hover { background: #f8f9fa; }
+        
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        
+        .action-buttons { 
+            display: flex; 
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .no-data-icon { font-size: 64px; margin-bottom: 15px; }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 15px; text-align: center; }
+            .header-buttons { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>👥 Kullanıcı Yönetimi</h1>
+        <div class="header-buttons">
+            <a th:href="@{/admin/users/add}" class="btn btn-success">➕ Yeni Kullanıcı Ekle</a>
+            <a th:href="@{/admin/dashboard}" class="btn btn-secondary">← Panele Dön</a>
+        </div>
+    </div>
+
+    <!-- Flash Mesajlar -->
+    <div th:if="${success}" class="alert alert-success">
+        <span>✅</span>
+        <span th:text="${success}">Başarılı!</span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger">
+        <span>❌</span>
+        <span th:text="${error}">Hata!</span>
+    </div>
+
+    <div class="content">
+        <!-- Kullanıcı yoksa -->
+        <div th:if="${#lists.isEmpty(users)}" class="no-data">
+            <div class="no-data-icon">👥</div>
+            <h3>Henüz kullanıcı bulunmuyor</h3>
+            <p>Yeni kullanıcı eklemek için yukarıdaki butonu kullanın.</p>
+        </div>
+
+        <!-- Kullanıcı tablosu -->
+        <div th:unless="${#lists.isEmpty(users)}" class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Kullanıcı</th>
+                        <th>E-posta</th>
+                        <th>TC No</th>
+                        <th>Telefon</th>
+                        <th>Rol</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.id}">1</td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar" th:text="${user.firstName.substring(0,1)}">A</div>
+                                <div>
+                                    <div th:text="${user.fullName}">Ad Soyad</div>
+                                    <small style="color: #666;">@<span th:text="${user.username}">username</span></small>
+                                </div>
+                            </div>
+                        </td>
+                        <td th:text="${user.email != null ? user.email : '-'}">email@example.com</td>
+                        <td th:text="${user.tcNo != null ? user.tcNo : '-'}">12345678901</td>
+                        <td th:text="${user.phoneNumber != null ? user.phoneNumber : '-'}">0555 555 55 55</td>
+                        <td>
+                            <span th:if="${user.isAdmin()}" class="badge badge-warning">👑 Admin</span>
+                            <span th:unless="${user.isAdmin()}" class="badge badge-info">👤 Kullanıcı</span>
+                        </td>
+                        <td>
+                            <span th:if="${user.enabled}" class="badge badge-success">✅ Aktif</span>
+                            <span th:unless="${user.enabled}" class="badge badge-danger">❌ Pasif</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" class="btn btn-primary btn-sm">✏️ Düzenle</a>
+                                <a th:href="@{/admin/users/delete/{id}(id=${user.id})}" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')">🗑️ Sil</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

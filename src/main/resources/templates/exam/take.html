@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sınav - Ehliyet Sınav Sistemi</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .exam-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .exam-header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .timer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .timer-info {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .timer-clock {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.3s;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            animation: fadeIn 0.4s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .question-media {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .question-media img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .question-media video {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #222;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .option {
+            background: #f5f5f5;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .option:hover {
+            background: #e8f4f8;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+        
+        .option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .option-label {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 30px;
+        }
+        
+        .option-text {
+            flex: 1;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-next {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-prev {
+            background: #e0e0e0;
+            color: #666;
+        }
+        
+        .btn-prev:hover {
+            background: #d0d0d0;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+        }
+        
+        .question-grid {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .question-grid h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 10px;
+        }
+        
+        .grid-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .grid-item.answered {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .grid-item.current {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .grid-item.unanswered {
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+            color: #666;
+        }
+        
+        .grid-item:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="exam-container">
+        <!-- Header -->
+        <div class="exam-header">
+            <div class="timer">
+                <div class="timer-info">
+                    <span>Soru </span>
+                    <span th:text="${questionNumber + 1}"></span> / 
+                    <span th:text="${totalQuestions}"></span>
+                </div>
+                <div class="timer-clock" id="timer">00:00</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" th:style="'width: ' + ${progress} + '%'"></div>
+            </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="question-card">
+            <div class="question-number">
+                SORU <span th:text="${questionNumber + 1}"></span>
+            </div>
+
+            <!-- Media (Image or Video) -->
+            <div class="question-media" th:if="${currentQuestion.hasMedia()}">
+                <img th:if="${currentQuestion.isImage()}" 
+                     th:src="@{'/uploads/' + ${currentQuestion.mediaPath}}" 
+                     alt="Soru görseli">
+                
+                <video th:if="${currentQuestion.isVideo()}" 
+                       th:src="@{'/uploads/' + ${currentQuestion.mediaPath}}" 
+                       controls>
+                    Tarayıcınız video oynatmayı desteklemiyor.
+                </video>
+            </div>
+
+            <div class="question-text" th:text="${currentQuestion.questionText}"></div>
+
+            <form th:action="@{/exam/answer}" method="post">
+                <input type="hidden" name="questionId" th:value="${currentQuestion.id}">
+                <input type="hidden" name="currentQuestion" th:value="${questionNumber}">
+                
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="answer" value="A" required
+                               th:checked="${userAnswers.get(currentQuestion.id) == 'A'}">
+                        <span class="option-label">A)</span>
+                        <span class="option-text" th:text="${currentQuestion.optionA}"></span>
+                    </label>
+                    
+                    <label class="option">
+                        <input type="radio" name="answer" value="B" required
+                               th:checked="${userAnswers.get(currentQuestion.id) == 'B'}">
+                        <span class="option-label">B)</span>
+                        <span class="option-text" th:text="${currentQuestion.optionB}"></span>
+                    </label>
+                    
+                    <label class="option">
+                        <input type="radio" name="answer" value="C" required
+                               th:checked="${userAnswers.get(currentQuestion.id) == 'C'}">
+                        <span class="option-label">C)</span>
+                        <span class="option-text" th:text="${currentQuestion.optionC}"></span>
+                    </label>
+                    
+                    <label class="option">
+                        <input type="radio" name="answer" value="D" required
+                               th:checked="${userAnswers.get(currentQuestion.id) == 'D'}">
+                        <span class="option-label">D)</span>
+                        <span class="option-text" th:text="${currentQuestion.optionD}"></span>
+                    </label>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" 
+                            th:if="${questionNumber > 0}"
+                            th:onclick="'window.location.href=\'/exam/take?question=' + ${questionNumber - 1} + '\''">
+                        ← Önceki Soru
+                    </button>
+                    
+                    <button type="submit" class="btn btn-next" 
+                            th:if="${questionNumber < totalQuestions - 1}">
+                        Sonraki Soru →
+                    </button>
+                    
+                    <button type="submit" class="btn btn-submit" 
+                            th:if="${questionNumber == totalQuestions - 1}">
+                        Sınavı Bitir ✓
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Question Grid -->
+        <div class="question-grid">
+            <h3>Soru Haritası</h3>
+            <div class="grid">
+                <div th:each="q, iterStat : ${questions}" 
+                     th:class="${iterStat.index == questionNumber ? 'grid-item current' : 
+                                userAnswers.containsKey(q.id) ? 'grid-item answered' : 'grid-item unanswered'}"
+                     th:onclick="'window.location.href=\'/exam/take?question=' + ${iterStat.index} + '\''"
+                     th:text="${iterStat.index + 1}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Timer
+        let startTime = Date.now();
+        setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('timer').textContent = 
+                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        }, 1000);
+    </script>
+</body>
+</html>

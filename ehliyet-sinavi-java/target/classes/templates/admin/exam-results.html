@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sınav Sonuçları - Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { 
+            background: white; 
+            padding: 20px 30px; 
+            border-radius: 15px; 
+            margin-bottom: 25px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .header h1 { color: #333; font-size: 24px; }
+        .btn { 
+            display: inline-block; 
+            padding: 12px 25px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            text-decoration: none; 
+            transition: all 0.3s;
+        }
+        .btn-primary { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-sm { padding: 8px 15px; font-size: 13px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 25px; 
+        }
+        .stat-card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 15px; 
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .stat-icon { font-size: 32px; margin-bottom: 10px; }
+        .stat-number { font-size: 36px; font-weight: bold; color: #f5576c; }
+        .stat-label { color: #666; margin-top: 8px; font-size: 14px; }
+        
+        .content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .table-responsive { overflow-x: auto; }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+        .table th, .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+        .table tr:hover { background: #f8f9fa; }
+        
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        
+        .score-cell {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .score-pass { color: #28a745; }
+        .score-fail { color: #dc3545; }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .no-data-icon { font-size: 64px; margin-bottom: 15px; }
+        
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 15px; text-align: center; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📊 Sınav Sonuçları</h1>
+        <a th:href="@{/admin/dashboard}" class="btn btn-secondary">← Panele Dön</a>
+    </div>
+
+    <!-- İstatistikler -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-number" th:text="${#lists.size(results)}">0</div>
+            <div class="stat-label">Toplam Sınav</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-number" th:text="${#numbers.formatDecimal(averageScore, 1, 1)}">0</div>
+            <div class="stat-label">Ortalama Puan</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📈</div>
+            <div class="stat-number">%<span th:text="${#numbers.formatDecimal(passRate, 1, 1)}">0</span></div>
+            <div class="stat-label">Başarı Oranı</div>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Sonuç yoksa -->
+        <div th:if="${#lists.isEmpty(results)}" class="no-data">
+            <div class="no-data-icon">📊</div>
+            <h3>Henüz sınav sonucu bulunmuyor</h3>
+            <p>Kullanıcılar sınava girdiğinde sonuçlar burada görüntülenecek.</p>
+        </div>
+
+        <!-- Sonuç tablosu -->
+        <div th:unless="${#lists.isEmpty(results)}" class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Kullanıcı</th>
+                        <th>Tarih</th>
+                        <th>Puan</th>
+                        <th>Doğru</th>
+                        <th>Yanlış</th>
+                        <th>Süre</th>
+                        <th>Durum</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="result : ${results}">
+                        <td th:text="${result.id}">1</td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar" th:text="${result.user.firstName.substring(0,1)}">A</div>
+                                <div>
+                                    <div th:text="${result.user.fullName}">Ad Soyad</div>
+                                    <small style="color: #666;">@<span th:text="${result.user.username}">username</span></small>
+                                </div>
+                            </div>
+                        </td>
+                        <td th:text="${#temporals.format(result.examDate, 'dd.MM.yyyy HH:mm')}">01.01.2024</td>
+                        <td>
+                            <span th:class="${result.passed} ? 'score-cell score-pass' : 'score-cell score-fail'"
+                                  th:text="${result.score}">85</span>
+                        </td>
+                        <td style="color: #28a745; font-weight: 600;" th:text="${result.correctAnswers}">42</td>
+                        <td style="color: #dc3545; font-weight: 600;" th:text="${result.wrongAnswers}">8</td>
+                        <td th:text="${result.formattedDuration}">25:30</td>
+                        <td>
+                            <span th:class="${result.passed} ? 'badge badge-success' : 'badge badge-danger'">
+                                <span th:if="${result.passed}">✅ Geçti</span>
+                                <span th:unless="${result.passed}">❌ Kaldı</span>
+                            </span>
+                        </td>
+                        <td>
+                            <a th:href="@{/admin/exam-results/{id}(id=${result.id})}" class="btn btn-primary btn-sm">📋 Detay</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${question.id != null ? 'Soru Düzenle' : 'Yeni Soru Ekle'} + ' - Admin Panel'">Soru Formu - Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { 
+            background: white; 
+            padding: 20px 30px; 
+            border-radius: 15px; 
+            margin-bottom: 25px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .header h1 { color: #333; font-size: 24px; }
+        .btn { 
+            display: inline-block; 
+            padding: 12px 25px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            text-decoration: none; 
+            transition: all 0.3s;
+        }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-primary { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            color: #f5576c;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group label span.required { color: #dc3545; }
+        
+        .form-group input[type="text"],
+        .form-group input[type="file"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .correct-answer-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .radio-option:hover { background: #e9ecef; }
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .radio-option.selected { 
+            background: #d4edda; 
+            border: 2px solid #28a745;
+        }
+        
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .media-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .media-section h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-wrapper input[type="file"] {
+            padding: 15px;
+            background: white;
+            cursor: pointer;
+        }
+        .file-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        .media-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .media-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+        }
+        .media-preview video {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+        }
+        .media-preview-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 15px; text-align: center; }
+            .options-grid { grid-template-columns: 1fr; }
+            .meta-grid { grid-template-columns: 1fr; }
+            .correct-answer-group { flex-direction: column; }
+            .form-actions { flex-direction: column; }
+            .form-actions .btn { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1 th:text="${question.id != null ? '✏️ Soru Düzenle' : '➕ Yeni Soru Ekle'}">Soru Formu</h1>
+        <a th:href="@{/admin/questions}" class="btn btn-secondary">← Listeye Dön</a>
+    </div>
+
+    <div class="form-card">
+        <form th:action="${question.id != null ? '/admin/questions/edit/' + question.id : '/admin/questions/add'}" 
+              method="post" 
+              enctype="multipart/form-data"
+              th:object="${question}">
+            
+            <!-- Soru Metni -->
+            <h3 class="section-title">📝 Soru Bilgileri</h3>
+            
+            <div class="form-group">
+                <label>Soru Metni <span class="required">*</span></label>
+                <textarea th:field="*{questionText}" required 
+                          placeholder="Soru metnini buraya yazınız..."></textarea>
+            </div>
+            
+            <!-- Şıklar -->
+            <h3 class="section-title">📋 Cevap Şıkları</h3>
+            
+            <div class="options-grid">
+                <div class="form-group">
+                    <label>A Şıkkı <span class="required">*</span></label>
+                    <input type="text" th:field="*{optionA}" required placeholder="A şıkkını giriniz">
+                </div>
+                <div class="form-group">
+                    <label>B Şıkkı <span class="required">*</span></label>
+                    <input type="text" th:field="*{optionB}" required placeholder="B şıkkını giriniz">
+                </div>
+                <div class="form-group">
+                    <label>C Şıkkı <span class="required">*</span></label>
+                    <input type="text" th:field="*{optionC}" required placeholder="C şıkkını giriniz">
+                </div>
+                <div class="form-group">
+                    <label>D Şıkkı <span class="required">*</span></label>
+                    <input type="text" th:field="*{optionD}" required placeholder="D şıkkını giriniz">
+                </div>
+            </div>
+            
+            <!-- Doğru Cevap -->
+            <div class="form-group">
+                <label>Doğru Cevap <span class="required">*</span></label>
+                <div class="correct-answer-group">
+                    <label class="radio-option">
+                        <input type="radio" th:field="*{correctAnswer}" value="A" required>
+                        <span>A</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" th:field="*{correctAnswer}" value="B">
+                        <span>B</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" th:field="*{correctAnswer}" value="C">
+                        <span>C</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" th:field="*{correctAnswer}" value="D">
+                        <span>D</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Kategori, Zorluk, Tip -->
+            <h3 class="section-title">⚙️ Soru Ayarları</h3>
+            
+            <div class="meta-grid">
+                <div class="form-group">
+                    <label>Kategori <span class="required">*</span></label>
+                    <select th:field="*{category}" required>
+                        <option th:each="cat : ${categories}" 
+                                th:value="${cat}" 
+                                th:text="${cat.displayName}">Kategori</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Zorluk <span class="required">*</span></label>
+                    <select th:field="*{difficulty}" required>
+                        <option value="1">⭐ Kolay</option>
+                        <option value="2">⭐⭐ Orta</option>
+                        <option value="3">⭐⭐⭐ Zor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Soru Tipi</label>
+                    <select th:field="*{type}">
+                        <option th:each="t : ${types}" 
+                                th:value="${t}" 
+                                th:text="${t.displayName}">Tip</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Medya Dosyası -->
+            <div class="media-section">
+                <h3>📁 Medya Dosyası (Görsel / Video)</h3>
+                
+                <div class="form-group">
+                    <label>Dosya Seçin</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" name="mediaFile" accept="image/*,video/*" id="mediaFile">
+                    </div>
+                    <div class="file-hint">
+                        📷 Desteklenen formatlar: JPG, PNG, GIF (max 50MB)<br>
+                        🎥 Video formatları: MP4, WebM (max 100MB)
+                    </div>
+                </div>
+                
+                <!-- Mevcut Medya Önizleme -->
+                <div th:if="${question.mediaPath != null}" class="media-preview">
+                    <div class="media-preview-label">📎 Mevcut Dosya:</div>
+                    <img th:if="${question.type != null && question.type.name() == 'IMAGE'}" 
+                         th:src="@{'/uploads/' + ${question.mediaPath}}" 
+                         alt="Soru görseli">
+                    <video th:if="${question.type != null && question.type.name() == 'VIDEO'}" 
+                           th:src="@{'/uploads/' + ${question.mediaPath}}" 
+                           controls>
+                        Tarayıcınız video etiketini desteklemiyor.
+                    </video>
+                    <div style="margin-top: 10px; color: #666; font-size: 13px;">
+                        <span th:text="${question.mediaPath}">dosya.jpg</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Açıklama -->
+            <div class="form-group">
+                <label>Açıklama (Opsiyonel)</label>
+                <textarea th:field="*{explanation}" 
+                          placeholder="Sorunun çözümü veya açıklaması..."></textarea>
+            </div>
+            
+            <!-- Aktif/Pasif -->
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" th:field="*{active}" id="active">
+                    <label for="active">✅ Soru Aktif (Sınavlarda gösterilsin)</label>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <a th:href="@{/admin/questions}" class="btn btn-secondary">← İptal</a>
+                <button type="submit" class="btn btn-primary">💾 Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Dosya seçildiğinde önizleme göster
+    document.getElementById('mediaFile').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            var preview = document.querySelector('.media-preview');
+            
+            if (!preview) {
+                preview = document.createElement('div');
+                preview.className = 'media-preview';
+                e.target.parentElement.parentElement.appendChild(preview);
+            }
+            
+            reader.onload = function(e) {
+                if (file.type.startsWith('image/')) {
+                    preview.innerHTML = '<div class="media-preview-label">📎 Seçilen Dosya:</div><img src="' + e.target.result + '" alt="Önizleme">';
+                } else if (file.type.startsWith('video/')) {
+                    preview.innerHTML = '<div class="media-preview-label">📎 Seçilen Dosya:</div><video src="' + e.target.result + '" controls></video>';
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Radio button seçildiğinde stil değiştir
+    document.querySelectorAll('.radio-option input[type="radio"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.radio-option').forEach(function(opt) {
+                opt.classList.remove('selected');
+            });
+            if (this.checked) {
+                this.parentElement.classList.add('selected');
+            }
+        });
+        
+        // Sayfa yüklendiğinde seçili olanı işaretle
+        if (radio.checked) {
+            radio.parentElement.classList.add('selected');
+        }
+    });
+</script>
+</body>
+</html>

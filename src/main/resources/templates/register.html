@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol - Ehliyet Sınav Sistemi</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .register-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .register-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .register-header h1 {
+            font-size: 26px;
+            font-weight: 700;
+        }
+        
+        .register-body {
+            padding: 30px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-register {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border-left: 4px solid #c33;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>🚗 Yeni Hesap Oluştur</h1>
+            <p>Ehliyet Sınavı Sistemine Hoş Geldiniz</p>
+        </div>
+        
+        <div class="register-body">
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}"></span>
+            </div>
+            
+            <form th:action="@{/register}" method="post" th:object="${user}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">Ad *</label>
+                        <input type="text" id="firstName" th:field="*{firstName}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastName">Soyad *</label>
+                        <input type="text" id="lastName" th:field="*{lastName}" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="tcNo">TC Kimlik No *</label>
+                    <input type="text" id="tcNo" th:field="*{tcNo}" pattern="[0-9]{11}" 
+                           title="11 haneli TC Kimlik numarası giriniz" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Kullanıcı Adı *</label>
+                    <input type="text" id="username" th:field="*{username}" 
+                           minlength="3" maxlength="50" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">E-posta *</label>
+                    <input type="email" id="email" th:field="*{email}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phoneNumber">Telefon</label>
+                    <input type="tel" id="phoneNumber" th:field="*{phoneNumber}" 
+                           placeholder="5551234567">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Şifre *</label>
+                    <input type="password" id="password" th:field="*{password}" 
+                           minlength="6" required>
+                </div>
+                
+                <button type="submit" class="btn-register">Kayıt Ol</button>
+            </form>
+            
+            <div class="login-link">
+                Zaten hesabınız var mı? <a th:href="@{/login}">Giriş Yapın</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
