@@ -1,10 +1,10 @@
-# 🚗 Ehliyet Sınav Sistemi
+# Ehliyet Sınav Sistemi
 
 Modern ve kapsamlı bir online ehliyet sınavı yönetim sistemi. Spring Boot, Spring Security, Thymeleaf ve MySQL teknolojileri ile geliştirilmiştir.
 
-## ✨ Özellikler
+## Özellikler
 
-### 👤 Kullanıcı Özellikleri
+### Kullanıcı Özellikleri
 - ✅ Kullanıcı kayıt ve giriş sistemi
 - ✅ 50 soruluk ehliyet sınavı
 - ✅ **Görselli sorular** desteği
@@ -16,7 +16,7 @@ Modern ve kapsamlı bir online ehliyet sınavı yönetim sistemi. Spring Boot, S
 - ✅ Geçmiş sınav kayıtları
 - ✅ Profil yönetimi
 
-### 👨‍💼 Admin Özellikleri
+### Admin Özellikleri
 - ✅ Kullanıcı yönetimi (CRUD)
 - ✅ Soru yönetimi (CRUD)
 - ✅ **Görselli soru ekleme**
@@ -26,7 +26,7 @@ Modern ve kapsamlı bir online ehliyet sınavı yönetim sistemi. Spring Boot, S
 - ✅ İstatistikler ve raporlar
 - ✅ Dashboard paneli
 
-## 🛠 Teknolojiler
+## Teknolojiler
 
 - **Backend:** Spring Boot 3.2.0
 - **Güvenlik:** Spring Security
@@ -36,14 +36,14 @@ Modern ve kapsamlı bir online ehliyet sınavı yönetim sistemi. Spring Boot, S
 - **Build Tool:** Maven
 - **Java Version:** 17
 
-## 📋 Gereksinimler
+## Gereksinimler
 
 - Java 17 veya üstü
 - Maven 3.6+
 - MySQL 8.0+ (veya H2 development için)
 - IDE (IntelliJ IDEA, Eclipse, VS Code önerilir)
 
-## 🚀 Kurulum
+## Kurulum
 
 ### 1. Projeyi İndirin
 ```bash
@@ -79,7 +79,7 @@ mvn spring-boot:run
 http://localhost:8080
 ```
 
-## 👥 Varsayılan Kullanıcılar
+## Varsayılan Kullanıcılar
 
 ### Admin Hesabı
 - **Kullanıcı Adı:** admin
@@ -89,7 +89,7 @@ http://localhost:8080
 - **Kullanıcı Adı:** user
 - **Şifre:** user123
 
-## 📂 Proje Yapısı
+## Proje Yapısı
 
 ```
 src/
@@ -131,7 +131,7 @@ src/
 │       └── application.properties
 ```
 
-## 📸 Görselli ve Videolu Soru Ekleme
+## Görselli ve Videolu Soru Ekleme
 
 ### Admin Panelinden Soru Ekleme
 1. Admin hesabı ile giriş yapın
@@ -149,7 +149,7 @@ src/
 - Maksimum dosya boyutu: 50MB
 - Dosyalar `uploads/` klasörüne kaydedilir
 
-## 🎯 Sınav Kuralları
+## Sınav Kuralları
 
 - **Toplam Soru:** 50
 - **Her Soru:** 2 puan
@@ -159,7 +159,7 @@ src/
 - Soru haritasından dilediğiniz soruya geçebilirsiniz
 - Süre sınırı yoktur (opsiyonel olarak eklenebilir)
 
-## 🔐 Güvenlik
+## Güvenlik
 
 - Spring Security ile güvenli authentication
 - BCrypt ile şifreleme
@@ -167,7 +167,7 @@ src/
 - Role-based authorization (ADMIN, USER)
 - Session yönetimi
 
-## 📊 Sınav Kategorileri
+## Sınav Kategorileri
 
 1. **Trafik Kuralları** - Temel trafik kuralları
 2. **Trafik İşaretleri** - Yol işaretleri ve anlamları
@@ -175,7 +175,7 @@ src/
 4. **Motor ve Araç Tekniği** - Araç bakımı ve teknik bilgiler
 5. **Çevresel Konular** - Çevre ve güvenlik
 
-## 🎨 Özelleştirme
+## Özelleştirme
 
 ### Sınav Soru Sayısını Değiştirme
 `ExamController.java` dosyasında:
@@ -192,7 +192,7 @@ this.passed = score >= 70; // 70'i değiştirin
 ### Tema Renkleri
 CSS dosyalarında gradient ve renk kodlarını değiştirebilirsiniz.
 
-## 📝 Geliştirme Notları
+## Geliştirme Notları
 
 - Proje Spring Boot best practices'e uygun olarak geliştirilmiştir
 - Lombok kullanılarak boilerplate kod azaltılmıştır
@@ -200,12 +200,12 @@ CSS dosyalarında gradient ve renk kodlarını değiştirebilirsiniz.
 - Service layer ile business logic ayrılmıştır
 - Thymeleaf ile server-side rendering yapılmıştır
 
-## 🐛 Hata Ayıklama
+## Hata Ayıklama
 
 ### Port 8080 Kullanımda
 `application.properties` dosyasında portu değiştirin:
 ```properties
-server.port=8081
+server.port=9090
 ```
 
 ### Database Bağlantı Hatası
@@ -216,16 +216,10 @@ server.port=8081
 ### Upload Klasörü Hatası
 Proje root dizininde `uploads/` klasörü otomatik oluşturulacaktır.
 
-## 📞 Destek
-
-Sorularınız için issue açabilirsiniz.
-
-## 📄 Lisans
-
-Bu proje eğitim amaçlı geliştirilmiştir.
 
 ---
-
-**Geliştirici:** Claude AI  
-**Versiyon:** 1.0.0  
+Bayram Bora Kabataş
+Efe Ata
+Samet Pülat
+  
 **Tarih:** 2025
